@@ -1,0 +1,55 @@
+name: "control_bot"
+
+services:
+  redis:
+    profiles:
+      - "all_containers"
+    container_name: "redis_tgbot"
+    image: redis:7
+    env_file: .env
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASS}
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - custom
+
+  telegram_bot:
+    profiles:
+      - "all_containers"
+    container_name: "telegram_bot"
+    build:
+      context: ./telegram_bot
+      dockerfile: ./telegram_bot.dockerfile
+    depends_on:
+      - redis
+    ports:
+      - "${LISTEN_HOST}:${LISTEN_PORT}:${LISTEN_PORT}"
+    volumes:
+      - ./docker_data/:/usr/src/controlbot/data/
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - custom
+
+  manage_users:
+    profiles:
+      - "manage"
+    container_name: "manage_container"
+    build:
+      context: ./telegram_bot
+      dockerfile: ./telegram_bot.dockerfile
+    command: sh
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./docker_data/:/usr/src/controlbot/data/
+    env_file:
+      - .env
+    networks:
+      - custom
+
+networks:
+  custom:
+    driver: bridge
