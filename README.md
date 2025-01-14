@@ -2,7 +2,7 @@
 
 # ENG
 
-<h1 align=center>Launch permision controller app</h1>
+<h1 align=center>Launch permission controller app</h1>
 
 This project allows you to manage the permission to run applications via telegram bot. 
 
